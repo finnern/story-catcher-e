@@ -17,7 +17,7 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home, current: true },
+  { name: 'Dashboard', href: '/dashboard', icon: Home, current: true },
   { name: 'Stories', href: '/stories', icon: Book, current: false },
   { name: 'Templates', href: '/templates', icon: FileText, current: false },
   { name: 'Analytics', href: '/analytics', icon: BarChart3, current: false },
@@ -46,8 +46,7 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
           {!collapsed && (
             <div>
-              <h1 className="text-lg font-semibold text-foreground">Everest</h1>
-              <p className="text-xs text-muted-foreground">Story Catcher</p>
+              <h1 className="text-lg font-semibold text-foreground">Story Catcher</h1>
             </div>
           )}
         </div>

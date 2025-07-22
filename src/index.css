@@ -4,11 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Everest Story Catcher Design System */
+/* Story Catcher Design System */
 
 @layer base {
   :root {
-    /* Everest Brand Colors - Mountain & Forest Palette */
+    /* Story Catcher Brand Colors - Deep Blue & Orange */
     --background: 210 20% 98%;
     --foreground: 215 20% 15%;
 
@@ -18,17 +18,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 20% 15%;
 
-    /* Primary: Deep Mountain Blue */
-    --primary: 213 94% 35%;
+    /* Primary: Deep Blue */
+    --primary: 220 100% 25%;
     --primary-foreground: 210 40% 98%;
-    --primary-hover: 213 94% 30%;
-    --primary-light: 213 94% 45%;
+    --primary-hover: 220 100% 20%;
+    --primary-light: 220 100% 35%;
 
-    /* Secondary: Forest Green */
-    --secondary: 158 64% 25%;
+    /* Secondary: Vibrant Orange */
+    --secondary: 25 95% 50%;
     --secondary-foreground: 210 40% 98%;
-    --secondary-hover: 158 64% 20%;
-    --secondary-light: 158 64% 35%;
+    --secondary-hover: 25 95% 45%;
+    --secondary-light: 25 95% 60%;
 
     /* Accent: Pristine Snow */
     --accent: 210 16% 96%;
@@ -40,7 +40,7 @@
     --muted-foreground: 215 16% 46%;
 
     /* Status Colors */
-    --success: 158 64% 25%;
+    --success: 25 95% 50%;
     --success-foreground: 210 40% 98%;
     --warning: 43 89% 50%;
     --warning-foreground: 215 20% 15%;
@@ -50,17 +50,17 @@
     /* Interactive Elements */
     --border: 215 20% 88%;
     --input: 215 20% 96%;
-    --ring: 213 94% 35%;
-    --focus: 213 94% 45%;
+    --ring: 220 100% 25%;
+    --focus: 220 100% 35%;
 
     /* Elevation & Depth */
     --shadow-sm: 0 1px 2px 0 hsl(215 20% 15% / 0.05);
     --shadow-md: 0 4px 6px -1px hsl(215 20% 15% / 0.1), 0 2px 4px -2px hsl(215 20% 15% / 0.1);
     --shadow-lg: 0 10px 15px -3px hsl(215 20% 15% / 0.1), 0 4px 6px -4px hsl(215 20% 15% / 0.1);
-    --shadow-elegant: 0 20px 25px -5px hsl(213 94% 35% / 0.1), 0 8px 10px -6px hsl(213 94% 35% / 0.1);
+    --shadow-elegant: 0 20px 25px -5px hsl(220 100% 25% / 0.1), 0 8px 10px -6px hsl(220 100% 25% / 0.1);
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(213 94% 35%), hsl(158 64% 25%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 100% 25%), hsl(25 95% 50%));
     --gradient-subtle: linear-gradient(180deg, hsl(210 20% 98%), hsl(210 16% 96%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 16% 98%));
 
