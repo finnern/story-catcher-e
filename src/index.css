@@ -1,40 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Everest Story Catcher Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Everest Brand Colors - Mountain & Forest Palette */
+    --background: 210 20% 98%;
+    --foreground: 215 20% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 20% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Primary: Deep Mountain Blue */
+    --primary: 213 94% 35%;
     --primary-foreground: 210 40% 98%;
+    --primary-hover: 213 94% 30%;
+    --primary-light: 213 94% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Forest Green */
+    --secondary: 158 64% 25%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-hover: 158 64% 20%;
+    --secondary-light: 158 64% 35%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Accent: Pristine Snow */
+    --accent: 210 16% 96%;
+    --accent-foreground: 215 20% 15%;
+    --accent-hover: 210 16% 92%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Muted: Soft Slate */
+    --muted: 215 16% 94%;
+    --muted-foreground: 215 16% 46%;
 
-    --destructive: 0 84.2% 60.2%;
+    /* Status Colors */
+    --success: 158 64% 25%;
+    --success-foreground: 210 40% 98%;
+    --warning: 43 89% 50%;
+    --warning-foreground: 215 20% 15%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Interactive Elements */
+    --border: 215 20% 88%;
+    --input: 215 20% 96%;
+    --ring: 213 94% 35%;
+    --focus: 213 94% 45%;
+
+    /* Elevation & Depth */
+    --shadow-sm: 0 1px 2px 0 hsl(215 20% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(215 20% 15% / 0.1), 0 2px 4px -2px hsl(215 20% 15% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(215 20% 15% / 0.1), 0 4px 6px -4px hsl(215 20% 15% / 0.1);
+    --shadow-elegant: 0 20px 25px -5px hsl(213 94% 35% / 0.1), 0 8px 10px -6px hsl(213 94% 35% / 0.1);
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(213 94% 35%), hsl(158 64% 25%));
+    --gradient-subtle: linear-gradient(180deg, hsl(210 20% 98%), hsl(210 16% 96%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 16% 98%));
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.75rem;
 
     --radius: 0.5rem;
 
@@ -100,6 +134,67 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer components {
+  /* Hero gradient backgrounds */
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  /* Elevation shadows */
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Interactive states */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Focus states */
+  .focus-ring:focus-visible {
+    outline: 2px solid hsl(var(--focus));
+    outline-offset: 2px;
   }
 }
