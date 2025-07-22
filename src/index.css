@@ -24,12 +24,12 @@
     --primary-hover: 220 100% 20%;
     --primary-light: 220 100% 35%;
 
-    /* Secondary: Vibrant Orange */
-    --secondary: 25 100% 55%;
+    /* Secondary: Dark Inviting Orange */
+    --secondary: 25 95% 45%;
     --secondary-foreground: 210 40% 98%;
-    --secondary-hover: 25 100% 50%;
-    --secondary-light: 25 100% 65%;
-    --secondary-dark: 25 90% 40%;
+    --secondary-hover: 25 95% 40%;
+    --secondary-light: 25 95% 55%;
+    --secondary-dark: 25 90% 35%;
 
     /* Accent: Pristine Snow */
     --accent: 210 16% 96%;
