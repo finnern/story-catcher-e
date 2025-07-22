@@ -1,43 +1,46 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, Users, CheckCircle } from 'lucide-react';
+import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function CatchStory() {
+  const [storyPrompt, setStoryPrompt] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
   const [storyDescription, setStoryDescription] = useState('');
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const navigate = useNavigate();
 
-  const handleCreateStory = () => {
-    if (storyTitle.trim()) {
+  const handleCatchStory = () => {
+    if (storyPrompt.trim() || storyTitle.trim()) {
       // For now, navigate to dashboard - in a real app this would create the story
       navigate('/dashboard');
     }
   };
 
+  const memoryPrompts = [
+    "What's a moment that changed you?",
+    "What story wants to be told?",
+    "Remember a choice you made that mattered?",
+    "What experience shaped who you are?",
+    "What's something only you could share?"
+  ];
+
+  const [currentPrompt] = useState(memoryPrompts[Math.floor(Math.random() * memoryPrompts.length)]);
+
   const features = [
     {
       icon: BookOpen,
-      title: 'Interactive Storytelling',
-      description: 'Create branching narratives with choices and consequences'
+      title: 'Your Story Matters',
+      description: 'Every experience has value - we help you discover it'
     },
     {
       icon: Zap,
-      title: 'Real-time Validation',
-      description: 'Catch errors instantly as you build your story'
-    },
-    {
-      icon: Users,
-      title: 'Character Management',
-      description: 'Develop rich characters with dynamic relationships'
-    },
-    {
-      icon: CheckCircle,
-      title: 'Export Ready',
-      description: 'Generate validated JSON for any platform'
+      title: 'Start Simply',
+      description: 'Begin with just a thought - we guide you from there'
     }
   ];
 
@@ -52,10 +55,12 @@ export default function CatchStory() {
               <span className="text-xl font-semibold text-foreground">Story Catcher</span>
             </div>
             <Button 
-              variant="outline" 
+              variant="ghost" 
+              size="sm"
               onClick={() => navigate('/dashboard')}
+              className="text-muted-foreground"
             >
-              View Dashboard
+              Dashboard
             </Button>
           </div>
         </div>
@@ -67,53 +72,90 @@ export default function CatchStory() {
           <h1 className="text-5xl font-bold text-foreground mb-6">
             Catch Your Story
           </h1>
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Transform your narrative ideas into interactive experiences. Create, validate, and export 
-            professional story content without the complexity.
+          <p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
+            Every story matters. Every perspective is unique. Start with whatever comes to mind.
+          </p>
+          <p className="text-sm text-muted-foreground/80 mb-12">
+            No pressure - just begin with what feels right
           </p>
 
-          {/* Quick Start Form */}
-          <Card className="max-w-lg mx-auto mb-16">
-            <CardHeader>
-              <CardTitle>Start Your First Story</CardTitle>
+          {/* Simplified Story Prompt */}
+          <Card className="max-w-lg mx-auto mb-8">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">{currentPrompt}</CardTitle>
               <CardDescription>
-                Give your story a name and watch it come to life
+                Share whatever comes to mind - a word, a feeling, a memory
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Input
-                placeholder="Story title..."
-                value={storyTitle}
-                onChange={(e) => setStoryTitle(e.target.value)}
-                className="text-lg"
+                placeholder="Type whatever feels right..."
+                value={storyPrompt}
+                onChange={(e) => setStoryPrompt(e.target.value)}
+                className="text-lg py-6 border-2 focus:border-primary/50"
               />
-              <Textarea
-                placeholder="Brief description (optional)..."
-                value={storyDescription}
-                onChange={(e) => setStoryDescription(e.target.value)}
-                rows={3}
-              />
+              
+              {/* More Options Dropdown */}
+              <div className="space-y-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMoreOptions(!showMoreOptions)}
+                  className="text-muted-foreground flex items-center gap-2"
+                >
+                  More Options
+                  {showMoreOptions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                
+                {showMoreOptions && (
+                  <div className="space-y-3 p-4 bg-muted/30 rounded-lg border">
+                    <Input
+                      placeholder="Story title (optional)..."
+                      value={storyTitle}
+                      onChange={(e) => setStoryTitle(e.target.value)}
+                    />
+                    <Textarea
+                      placeholder="Brief description (optional)..."
+                      value={storyDescription}
+                      onChange={(e) => setStoryDescription(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
+
               <Button
-                onClick={handleCreateStory}
-                className="w-full text-lg py-6"
-                disabled={!storyTitle.trim()}
+                onClick={handleCatchStory}
+                className="w-full text-lg py-6 mt-6"
+                disabled={!storyPrompt.trim() && !storyTitle.trim()}
               >
-                Catch This Story
+                Catch My Story
               </Button>
+              
+              <p className="text-xs text-muted-foreground mt-2">
+                ✨ Your story is safe with us
+              </p>
             </CardContent>
           </Card>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Simplified Features */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover-lift transition-smooth">
+              <Card key={index} className="text-center hover-lift transition-smooth border-primary/10">
                 <CardContent className="pt-6">
-                  <feature.icon className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <feature.icon className="h-10 w-10 text-primary mx-auto mb-3" />
                   <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Encouraging Community Hint */}
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Join thousands sharing their unique perspectives
+            </p>
           </div>
         </div>
       </section>
@@ -122,7 +164,7 @@ export default function CatchStory() {
       <footer className="border-t bg-muted/30 py-8 px-6">
         <div className="container mx-auto text-center">
           <p className="text-muted-foreground">
-            Start crafting your interactive story today
+            Every story begins with a single moment of courage
           </p>
         </div>
       </footer>
