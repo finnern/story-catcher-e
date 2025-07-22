@@ -21,13 +21,14 @@ const buttonVariants = cva(
         hero: "gradient-hero text-primary-foreground hover:shadow-elegant hover:scale-105 transition-bounce shadow-lg",
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-md hover:shadow-lg",
         warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-md hover:shadow-lg",
-        record: "bg-secondary-dark text-secondary-foreground hover:bg-secondary-hover hover:scale-105 transition-bounce shadow-lg rounded-full",
+        record: "bg-secondary-dark text-secondary-foreground hover:bg-secondary-dark/90 hover:scale-105 transition-bounce shadow-lg",
       },
       size: {
         default: "h-11 px-6 py-3",
         sm: "h-9 rounded-lg px-4",
         lg: "h-13 rounded-lg px-8 text-base",
         icon: "h-11 w-11",
+        round: "rounded-full px-8 py-4",
       },
     },
     defaultVariants: {

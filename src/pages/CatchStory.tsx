@@ -95,41 +95,13 @@ export default function CatchStory() {
                 className="text-lg py-6 border-2 focus:border-primary/50"
               />
               
-              {/* More Options Dropdown */}
-              <div className="space-y-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowMoreOptions(!showMoreOptions)}
-                  className="text-muted-foreground flex items-center gap-2"
-                >
-                  More Options
-                  {showMoreOptions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-                
-                {showMoreOptions && (
-                  <div className="space-y-3 p-4 bg-muted/30 rounded-lg border">
-                    <Input
-                      placeholder="Story title (optional)..."
-                      value={storyTitle}
-                      onChange={(e) => setStoryTitle(e.target.value)}
-                    />
-                    <Textarea
-                      placeholder="Brief description (optional)..."
-                      value={storyDescription}
-                      onChange={(e) => setStoryDescription(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                )}
-              </div>
 
               <Button
                 onClick={handleCatchStory}
                 variant="record"
-                size="lg"
-                className="w-full text-lg py-8 mt-6 text-white"
-                disabled={!storyPrompt.trim() && !storyTitle.trim()}
+                size="round"
+                className="w-full text-lg py-8 mt-6 text-white rounded-full"
+                disabled={!storyPrompt.trim()}
               >
                 <Mic className="h-6 w-6 mr-3" />
                 Catch My Story
