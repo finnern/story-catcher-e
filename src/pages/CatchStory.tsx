@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function CatchStory() {
@@ -126,9 +126,12 @@ export default function CatchStory() {
 
               <Button
                 onClick={handleCatchStory}
-                className="w-full text-lg py-6 mt-6"
+                variant="record"
+                size="lg"
+                className="w-full text-lg py-8 mt-6 text-white"
                 disabled={!storyPrompt.trim() && !storyTitle.trim()}
               >
+                <Mic className="h-6 w-6 mr-3" />
                 Catch My Story
               </Button>
               

@@ -29,6 +29,7 @@
     --secondary-foreground: 210 40% 98%;
     --secondary-hover: 25 95% 45%;
     --secondary-light: 25 95% 60%;
+    --secondary-dark: 25 85% 35%;
 
     /* Accent: Pristine Snow */
     --accent: 210 16% 96%;
