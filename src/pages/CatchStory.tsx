@@ -80,11 +80,11 @@ export default function CatchStory() {
           </p>
 
           {/* Simplified Story Prompt */}
-          <Card className="max-w-lg mx-auto mb-8">
+          <Card className="max-w-lg mx-auto mb-8 border-primary/20 shadow-elegant">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">{currentPrompt}</CardTitle>
+              <CardTitle className="text-lg text-primary">{currentPrompt}</CardTitle>
               <CardDescription>
-                Share whatever comes to mind - a word, a feeling, a memory
+                Share your story
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
