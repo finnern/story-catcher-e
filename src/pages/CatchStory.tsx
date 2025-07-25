@@ -47,10 +47,10 @@ export default function CatchStory() {
           setStoryPrompt(prev => prev + ' ' + finalTranscript);
         }
         
-        // Update input field with interim results for real-time feedback
+        // Update textarea field with interim results for real-time feedback
         if (interimTranscript && isRecording) {
           const currentValue = storyPrompt + ' ' + finalTranscript;
-          const tempElement = document.querySelector('input[placeholder="Type whatever feels right..."]') as HTMLInputElement;
+          const tempElement = document.querySelector('textarea[placeholder*="Tippen Sie hier"]') as HTMLTextAreaElement;
           if (tempElement) {
             tempElement.value = currentValue + ' ' + interimTranscript;
           }
@@ -186,13 +186,20 @@ export default function CatchStory() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Input
-                placeholder="Type whatever feels right..."
+              <Textarea
+                placeholder="Tippen Sie hier oder nutzen Sie die Sprachaufnahme..."
                 value={storyPrompt}
                 onChange={(e) => setStoryPrompt(e.target.value)}
-                className="text-lg py-6 border-2 focus:border-primary/50"
+                className="text-lg py-4 border-2 focus:border-primary/50 min-h-[120px] resize-none"
+                rows={4}
               />
               
+              {isRecording && (
+                <div className="flex items-center justify-center gap-2 text-red-600 animate-pulse">
+                  <div className="w-3 h-3 bg-red-600 rounded-full animate-ping"></div>
+                  <span className="text-sm font-medium">Aufnahme läuft... Sprechen Sie jetzt</span>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <Button
