@@ -1,18 +1,84 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp, Mic } from 'lucide-react';
+import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp, Mic, MicOff, Square } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CatchStory() {
   const [storyPrompt, setStoryPrompt] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
   const [storyDescription, setStoryDescription] = useState('');
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Check if speech recognition is supported
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      setIsSupported(true);
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript) {
+          setStoryPrompt(prev => prev + ' ' + finalTranscript);
+        }
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+        toast({
+          title: "Recording Error",
+          description: "There was an issue with voice recording. Please try again.",
+          variant: "destructive"
+        });
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+  }, [toast]);
+
+  const handleVoiceRecording = () => {
+    if (!isSupported) {
+      toast({
+        title: "Not Supported",
+        description: "Voice recording is not supported in your browser.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsRecording(true);
+      toast({
+        title: "Recording Started",
+        description: "Start speaking to record your story..."
+      });
+    }
+  };
 
   const handleCatchStory = () => {
     if (storyPrompt.trim() || storyTitle.trim()) {
@@ -96,16 +162,39 @@ export default function CatchStory() {
               />
               
 
-              <Button
-                onClick={handleCatchStory}
-                variant="record"
-                size="round"
-                className="w-full text-lg py-8 mt-6 text-white rounded-full"
-                disabled={!storyPrompt.trim()}
-              >
-                <Mic className="h-6 w-6 mr-3" />
-                Catch My Story
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleVoiceRecording}
+                  variant="record"
+                  size="round"
+                  className={`flex-1 text-lg py-8 text-white rounded-full transition-all ${
+                    isRecording ? 'animate-pulse bg-red-600 hover:bg-red-700' : ''
+                  }`}
+                  disabled={!isSupported}
+                >
+                  {isRecording ? (
+                    <>
+                      <Square className="h-6 w-6 mr-3" />
+                      Stop Recording
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-6 w-6 mr-3" />
+                      Record Story
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  onClick={handleCatchStory}
+                  variant="secondary"
+                  size="round"
+                  className="px-6 text-lg py-8 rounded-full"
+                  disabled={!storyPrompt.trim()}
+                >
+                  Submit
+                </Button>
+              </div>
               
               <p className="text-xs text-muted-foreground mt-2">
                 ✨ Your story is safe with us
