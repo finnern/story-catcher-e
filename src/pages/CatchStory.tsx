@@ -23,15 +23,24 @@ export default function CatchStory() {
     // Check if speech recognition is supported
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       setIsSupported(true);
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'de-DE'; // Deutsch
-      recognitionRef.current.maxAlternatives = 1;
+      console.log('Speech recognition is supported');
       
-      // Debug: Add logging
-      console.log('Speech recognition initialized with language:', recognitionRef.current.lang);
+      try {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+        
+        // Basic settings
+        recognitionRef.current.continuous = false; // Changed to false for testing
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'en-US'; // Start with English for testing
+        recognitionRef.current.maxAlternatives = 1;
+        
+        console.log('Speech recognition initialized successfully');
+      } catch (error) {
+        console.error('Error initializing speech recognition:', error);
+        setIsSupported(false);
+        return;
+      }
 
       recognitionRef.current.onresult = (event: any) => {
         console.log('Speech recognition result received:', event.results.length);
