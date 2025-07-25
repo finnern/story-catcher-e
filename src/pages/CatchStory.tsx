@@ -27,34 +27,56 @@ export default function CatchStory() {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'de-DE'; // Deutsch für bessere Erkennung
+      recognitionRef.current.lang = 'de-DE'; // Deutsch
       recognitionRef.current.maxAlternatives = 1;
+      
+      // Debug: Add logging
+      console.log('Speech recognition initialized with language:', recognitionRef.current.lang);
 
       recognitionRef.current.onresult = (event: any) => {
+        console.log('Speech recognition result received:', event.results.length);
         let finalTranscript = '';
         let interimTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          console.log(`Result ${i}: "${transcript}" (confidence: ${event.results[i][0].confidence}, final: ${event.results[i].isFinal})`);
+          
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            finalTranscript += transcript;
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interimTranscript += transcript;
           }
         }
         
         // Show real-time transcription with interim results
         if (finalTranscript) {
+          console.log('Adding final transcript:', finalTranscript);
           setStoryPrompt(prev => prev + ' ' + finalTranscript);
         }
         
         // Update textarea field with interim results for real-time feedback
         if (interimTranscript && isRecording) {
+          console.log('Showing interim transcript:', interimTranscript);
           const currentValue = storyPrompt + ' ' + finalTranscript;
           const tempElement = document.querySelector('textarea[placeholder*="Tippen Sie hier"]') as HTMLTextAreaElement;
           if (tempElement) {
             tempElement.value = currentValue + ' ' + interimTranscript;
           }
         }
+      };
+
+      recognitionRef.current.onstart = () => {
+        console.log('Speech recognition started');
+        setIsRecording(true);
+      };
+
+      recognitionRef.current.onspeechstart = () => {
+        console.log('Speech detected');
+      };
+
+      recognitionRef.current.onspeechend = () => {
+        console.log('Speech ended');
       };
 
       recognitionRef.current.onerror = (event: any) => {
