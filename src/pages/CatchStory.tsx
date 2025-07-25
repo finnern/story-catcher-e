@@ -44,11 +44,15 @@ export default function CatchStory() {
       recognitionRef.current.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsRecording(false);
-        toast({
-          title: "Recording Error",
-          description: "There was an issue with voice recording. Please try again.",
-          variant: "destructive"
-        });
+        
+        // Only show error for actual problems, not for "no-speech" timeout
+        if (event.error !== 'no-speech') {
+          toast({
+            title: "Recording Error",
+            description: "There was an issue with voice recording. Please try again.",
+            variant: "destructive"
+          });
+        }
       };
 
       recognitionRef.current.onend = () => {
