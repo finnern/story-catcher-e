@@ -76,11 +76,11 @@ export default function CatchStory() {
     }
   }, [toast]);
 
-  const handleVoiceRecording = () => {
+  const handleVoiceRecording = async () => {
     if (!isSupported) {
       toast({
-        title: "Not Supported",
-        description: "Voice recording is not supported in your browser.",
+        title: "Nicht unterstützt",
+        description: "Spracherkennung wird in Ihrem Browser nicht unterstützt.",
         variant: "destructive"
       });
       return;
@@ -90,12 +90,24 @@ export default function CatchStory() {
       recognitionRef.current?.stop();
       setIsRecording(false);
     } else {
-      recognitionRef.current?.start();
-      setIsRecording(true);
-      toast({
-        title: "Recording Started",
-        description: "Start speaking to record your story..."
-      });
+      try {
+        // Request microphone permission first
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        recognitionRef.current?.start();
+        setIsRecording(true);
+        toast({
+          title: "Aufnahme gestartet",
+          description: "Sprechen Sie jetzt, um Ihre Geschichte aufzunehmen..."
+        });
+      } catch (error) {
+        console.error('Microphone permission error:', error);
+        toast({
+          title: "Mikrofonzugriff benötigt",
+          description: "Bitte erlauben Sie den Mikrofonzugriff in Ihrem Browser, um Geschichten aufzunehmen.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
