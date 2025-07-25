@@ -1,248 +1,42 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp, Mic, MicOff, Square } from 'lucide-react';
+import { BookOpen, Zap, Users, CheckCircle, ChevronDown, ChevronUp, Mic, MicOff, Square, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 export default function CatchStory() {
   const [storyPrompt, setStoryPrompt] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
   const [storyDescription, setStoryDescription] = useState('');
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const recognitionRef = useRef<any>(null);
+  
+  // Use the new robust speech recognition hook
+  const { 
+    isRecording, 
+    isLoading, 
+    startRecording, 
+    stopRecording, 
+    transcript, 
+    error 
+  } = useSpeechRecognition();
 
+  // Update storyPrompt when transcript changes
   useEffect(() => {
-    // Check if speech recognition is supported
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      setIsSupported(true);
-      console.log('Speech recognition is supported');
-      
-      try {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        recognitionRef.current = new SpeechRecognition();
-        
-        // Enhanced settings for better speech detection
-        recognitionRef.current.continuous = true; // Keep listening
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'en-US'; // English language
-        recognitionRef.current.maxAlternatives = 1; // Reduce for better performance
-        
-        // Key settings for better speech detection
-        if ('webkitSpeechRecognition' in window) {
-          recognitionRef.current.continuous = true;
-          recognitionRef.current.interimResults = true;
-          // Try to be more sensitive to speech
-        }
-        
-        console.log('Speech recognition initialized with lang:', recognitionRef.current.lang);
-      } catch (error) {
-        console.error('Error initializing speech recognition:', error);
-        setIsSupported(false);
-        return;
-      }
-
-      recognitionRef.current.onresult = (event: any) => {
-        console.log('Speech recognition result received:', event.results.length);
-        let finalTranscript = '';
-        let interimTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          console.log(`Result ${i}: "${transcript}" (confidence: ${event.results[i][0].confidence}, final: ${event.results[i].isFinal})`);
-          
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        
-        // Show real-time transcription with interim results
-        if (finalTranscript) {
-          console.log('Adding final transcript:', finalTranscript);
-          setStoryPrompt(prev => prev + ' ' + finalTranscript);
-        }
-        
-        // Update textarea field with interim results for real-time feedback
-        if (interimTranscript && isRecording) {
-          console.log('Showing interim transcript:', interimTranscript);
-          const currentValue = storyPrompt + ' ' + finalTranscript;
-          const tempElement = document.querySelector('textarea[placeholder*="Tippen Sie hier"]') as HTMLTextAreaElement;
-          if (tempElement) {
-            tempElement.value = currentValue + ' ' + interimTranscript;
-          }
-        }
-      };
-
-      recognitionRef.current.onstart = () => {
-        console.log('Speech recognition started');
-        setIsRecording(true);
-        toast({
-          title: "Listening",
-          description: "Microphone is active. Start speaking now."
-        });
-      };
-
-      recognitionRef.current.onspeechstart = () => {
-        console.log('Speech detected - good, microphone is working!');
-        toast({
-          title: "Speech Detected",
-          description: "Your voice is being heard!"
-        });
-      };
-
-      recognitionRef.current.onspeechend = () => {
-        console.log('Speech ended - processing what was heard...');
-      };
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error, 'Error details:', event);
-        setIsRecording(false);
-        
-        let errorMessage = "";
-        switch(event.error) {
-          case 'no-speech':
-            errorMessage = "No speech detected. Please speak louder and more clearly.";
-            // Don't stop, try to restart automatically
-            setTimeout(() => {
-              if (recognitionRef.current && !isRecording) {
-                console.log('Auto-restarting speech recognition after no-speech');
-                try {
-                  recognitionRef.current.start();
-                  setIsRecording(true);
-                } catch (e) {
-                  console.error('Failed to restart:', e);
-                }
-              }
-            }, 1000);
-            break;
-          case 'audio-capture':
-            errorMessage = "Microphone access failed. Please check your microphone settings.";
-            break;
-          case 'not-allowed':
-            errorMessage = "Microphone access denied. Please allow microphone access.";
-            break;
-          case 'network':
-            errorMessage = "Network error. Please check your internet connection.";
-            break;
-          default:
-            errorMessage = `Speech recognition error: ${event.error}`;
-        }
-        
-        toast({
-          title: "Recording Issue",
-          description: errorMessage,
-          variant: event.error === 'no-speech' ? "default" : "destructive"
-        });
-      };
-
-      recognitionRef.current.onend = () => {
-        console.log('Speech recognition ended');
-        setIsRecording(false);
-        toast({
-          title: "Recording Stopped",
-          description: "Processing complete. Check if text appeared above."
-        });
-      };
+    if (transcript && transcript !== storyPrompt) {
+      setStoryPrompt(prev => prev + ' ' + transcript);
     }
-  }, [toast]);
+  }, [transcript]);
 
   const handleVoiceRecording = async () => {
-    if (!isSupported) {
-      toast({
-        title: "Not Supported",
-        description: "Speech recognition is not supported in your browser.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (isRecording) {
-      console.log('Stopping speech recognition');
-      recognitionRef.current?.stop();
-      setIsRecording(false);
-      toast({
-        title: "Recording Stopped",
-        description: "Voice recording has been stopped."
-      });
+      stopRecording();
     } else {
-      try {
-        console.log('Requesting microphone access...');
-        
-        // Test microphone access with enhanced settings
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: false, // Disable to get raw audio
-            noiseSuppression: false, // Disable to avoid over-filtering
-            autoGainControl: true,   // Keep for volume adjustment
-            sampleRate: 16000,       // Standard rate for speech recognition
-            channelCount: 1          // Mono audio is sufficient
-          }
-        });
-        
-        console.log('Microphone access granted, audio tracks:', stream.getAudioTracks().length);
-        
-        // Test audio levels to ensure microphone is working
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(stream);
-        const analyser = audioContext.createAnalyser();
-        source.connect(analyser);
-        
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        
-        // Check for audio input for 2 seconds
-        let hasAudio = false;
-        const checkAudio = () => {
-          analyser.getByteFrequencyData(dataArray);
-          const average = dataArray.reduce((a, b) => a + b) / bufferLength;
-          console.log('Audio level:', average);
-          if (average > 10) { // Threshold for audio detection
-            hasAudio = true;
-            console.log('✓ Audio input detected - microphone is working!');
-          }
-        };
-        
-        // Check audio for 2 seconds
-        const interval = setInterval(checkAudio, 100);
-        setTimeout(() => {
-          clearInterval(interval);
-          audioContext.close();
-          
-          if (hasAudio) {
-            console.log('✓ Microphone test passed - starting speech recognition');
-          } else {
-            console.log('⚠ Low audio levels detected - speech recognition may not work well');
-            toast({
-              title: "Low Audio Detected",
-              description: "Please speak louder or check your microphone settings.",
-              variant: "default"
-            });
-          }
-        }, 2000);
-        
-        // Stop the test stream
-        stream.getTracks().forEach(track => track.stop());
-        
-        console.log('Starting speech recognition...');
-        recognitionRef.current?.start();
-        console.log('Speech recognition start() called successfully');
-      } catch (error) {
-        console.error('Microphone or speech recognition error:', error);
-        toast({
-          title: "Error Starting Recording",
-          description: "Microphone access or speech recognition failed. Please check your browser settings.",
-          variant: "destructive"
-        });
-      }
+      await startRecording();
     }
   };
 
@@ -343,9 +137,14 @@ export default function CatchStory() {
                   className={`flex-1 text-lg py-8 text-white rounded-full transition-all ${
                     isRecording ? 'animate-pulse bg-red-600 hover:bg-red-700' : ''
                   }`}
-                  disabled={!isSupported}
+                  disabled={isLoading}
                 >
-                  {isRecording ? (
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-6 w-6 mr-3 animate-spin" />
+                      Loading AI...
+                    </>
+                  ) : isRecording ? (
                     <>
                       <Square className="h-6 w-6 mr-3" />
                       Stop Recording
