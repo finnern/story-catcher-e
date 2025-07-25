@@ -29,13 +29,18 @@ export default function CatchStory() {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         recognitionRef.current = new SpeechRecognition();
         
-        // Basic settings
-        recognitionRef.current.continuous = false; // Changed to false for testing
+        // Optimized settings for better recognition
+        recognitionRef.current.continuous = true; // Keep listening
         recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'en-US'; // Start with English for testing
-        recognitionRef.current.maxAlternatives = 1;
+        recognitionRef.current.lang = 'de-DE'; // German language
+        recognitionRef.current.maxAlternatives = 3; // More alternatives
         
-        console.log('Speech recognition initialized successfully');
+        // Additional settings for better performance
+        if ('grammars' in recognitionRef.current) {
+          recognitionRef.current.grammars = null;
+        }
+        
+        console.log('Speech recognition initialized with lang:', recognitionRef.current.lang);
       } catch (error) {
         console.error('Error initializing speech recognition:', error);
         setIsSupported(false);
@@ -89,17 +94,44 @@ export default function CatchStory() {
       };
 
       recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
+        console.error('Speech recognition error:', event.error, 'Error details:', event);
         setIsRecording(false);
         
-        // Only show error for actual problems, not for "no-speech" timeout
-        if (event.error !== 'no-speech') {
-          toast({
-            title: "Recording Error",
-            description: "There was an issue with voice recording. Please try again.",
-            variant: "destructive"
-          });
+        let errorMessage = "";
+        switch(event.error) {
+          case 'no-speech':
+            errorMessage = "Keine Sprache erkannt. Sprechen Sie lauter und deutlicher.";
+            // Don't stop, try to restart automatically
+            setTimeout(() => {
+              if (recognitionRef.current && !isRecording) {
+                console.log('Auto-restarting speech recognition after no-speech');
+                try {
+                  recognitionRef.current.start();
+                  setIsRecording(true);
+                } catch (e) {
+                  console.error('Failed to restart:', e);
+                }
+              }
+            }, 1000);
+            break;
+          case 'audio-capture':
+            errorMessage = "Mikrofonzugriff fehlgeschlagen. Überprüfen Sie Ihre Mikrofoneinstellungen.";
+            break;
+          case 'not-allowed':
+            errorMessage = "Mikrofonzugriff wurde verweigert. Bitte erlauben Sie den Zugriff.";
+            break;
+          case 'network':
+            errorMessage = "Netzwerkfehler. Überprüfen Sie Ihre Internetverbindung.";
+            break;
+          default:
+            errorMessage = `Spracherkennungsfehler: ${event.error}`;
         }
+        
+        toast({
+          title: "Aufnahmeproblem",
+          description: errorMessage,
+          variant: event.error === 'no-speech' ? "default" : "destructive"
+        });
       };
 
       recognitionRef.current.onend = () => {
@@ -119,24 +151,49 @@ export default function CatchStory() {
     }
 
     if (isRecording) {
+      console.log('Stopping speech recognition');
       recognitionRef.current?.stop();
       setIsRecording(false);
+      toast({
+        title: "Aufnahme gestoppt",
+        description: "Sprachaufnahme wurde beendet."
+      });
     } else {
       try {
-        // Request microphone permission first
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('Requesting microphone access...');
+        
+        // Test microphone access with more specific constraints
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        
+        // Test audio levels
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        
+        console.log('Microphone access granted, starting speech recognition...');
+        
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop());
         
         recognitionRef.current?.start();
-        setIsRecording(true);
+        console.log('Speech recognition start() called');
+        
         toast({
           title: "Aufnahme gestartet",
-          description: "Sprechen Sie jetzt, um Ihre Geschichte aufzunehmen..."
+          description: "Sprechen Sie deutlich und laut. Das System hört zu..."
         });
       } catch (error) {
-        console.error('Microphone permission error:', error);
+        console.error('Microphone or speech recognition error:', error);
         toast({
-          title: "Mikrofonzugriff benötigt",
-          description: "Bitte erlauben Sie den Mikrofonzugriff in Ihrem Browser, um Geschichten aufzunehmen.",
+          title: "Fehler beim Starten",
+          description: "Mikrofonzugriff oder Spracherkennung fehlgeschlagen. Überprüfen Sie Ihre Browsereinstellungen.",
           variant: "destructive"
         });
       }
