@@ -27,7 +27,11 @@ export default function CatchStory() {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+      recognitionRef.current.lang = 'de-DE'; // Deutsch für bessere Erkennung
+      
+      // Add more robust settings
+      recognitionRef.current.maxAlternatives = 1;
+      recognitionRef.current.grammars = null;
 
       recognitionRef.current.onresult = (event: any) => {
         let finalTranscript = '';
