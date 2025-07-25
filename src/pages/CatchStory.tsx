@@ -31,13 +31,28 @@ export default function CatchStory() {
 
       recognitionRef.current.onresult = (event: any) => {
         let finalTranscript = '';
+        let interimTranscript = '';
+        
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
           }
         }
+        
+        // Show real-time transcription with interim results
         if (finalTranscript) {
           setStoryPrompt(prev => prev + ' ' + finalTranscript);
+        }
+        
+        // Update input field with interim results for real-time feedback
+        if (interimTranscript && isRecording) {
+          const currentValue = storyPrompt + ' ' + finalTranscript;
+          const tempElement = document.querySelector('input[placeholder="Type whatever feels right..."]') as HTMLInputElement;
+          if (tempElement) {
+            tempElement.value = currentValue + ' ' + interimTranscript;
+          }
         }
       };
 
