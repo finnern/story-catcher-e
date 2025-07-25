@@ -78,14 +78,22 @@ export default function CatchStory() {
       recognitionRef.current.onstart = () => {
         console.log('Speech recognition started');
         setIsRecording(true);
+        toast({
+          title: "Listening",
+          description: "Microphone is active. Start speaking now."
+        });
       };
 
       recognitionRef.current.onspeechstart = () => {
-        console.log('Speech detected');
+        console.log('Speech detected - good, microphone is working!');
+        toast({
+          title: "Speech Detected",
+          description: "Your voice is being heard!"
+        });
       };
 
       recognitionRef.current.onspeechend = () => {
-        console.log('Speech ended');
+        console.log('Speech ended - processing what was heard...');
       };
 
       recognitionRef.current.onerror = (event: any) => {
@@ -130,7 +138,12 @@ export default function CatchStory() {
       };
 
       recognitionRef.current.onend = () => {
+        console.log('Speech recognition ended');
         setIsRecording(false);
+        toast({
+          title: "Recording Stopped",
+          description: "Processing complete. Check if text appeared above."
+        });
       };
     }
   }, [toast]);
@@ -166,24 +179,16 @@ export default function CatchStory() {
           }
         });
         
-        // Test audio levels
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(stream);
-        const analyser = audioContext.createAnalyser();
-        source.connect(analyser);
-        
-        console.log('Microphone access granted, starting speech recognition...');
+        console.log('Microphone access granted, audio tracks:', stream.getAudioTracks().length);
         
         // Stop the test stream
         stream.getTracks().forEach(track => track.stop());
         
+        console.log('Starting speech recognition...');
         recognitionRef.current?.start();
-        console.log('Speech recognition start() called');
+        console.log('Speech recognition start() called successfully');
         
-        toast({
-          title: "Recording Started",
-          description: "Speak clearly and loudly. The system is listening..."
-        });
+        // Don't show toast here, wait for onstart event
       } catch (error) {
         console.error('Microphone or speech recognition error:', error);
         toast({
