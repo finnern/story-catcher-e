@@ -32,13 +32,8 @@ export default function CatchStory() {
         // Optimized settings for better recognition
         recognitionRef.current.continuous = true; // Keep listening
         recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'de-DE'; // German language
+        recognitionRef.current.lang = 'en-US'; // English language
         recognitionRef.current.maxAlternatives = 3; // More alternatives
-        
-        // Additional settings for better performance
-        if ('grammars' in recognitionRef.current) {
-          recognitionRef.current.grammars = null;
-        }
         
         console.log('Speech recognition initialized with lang:', recognitionRef.current.lang);
       } catch (error) {
@@ -100,7 +95,7 @@ export default function CatchStory() {
         let errorMessage = "";
         switch(event.error) {
           case 'no-speech':
-            errorMessage = "Keine Sprache erkannt. Sprechen Sie lauter und deutlicher.";
+            errorMessage = "No speech detected. Please speak louder and more clearly.";
             // Don't stop, try to restart automatically
             setTimeout(() => {
               if (recognitionRef.current && !isRecording) {
@@ -115,20 +110,20 @@ export default function CatchStory() {
             }, 1000);
             break;
           case 'audio-capture':
-            errorMessage = "Mikrofonzugriff fehlgeschlagen. Überprüfen Sie Ihre Mikrofoneinstellungen.";
+            errorMessage = "Microphone access failed. Please check your microphone settings.";
             break;
           case 'not-allowed':
-            errorMessage = "Mikrofonzugriff wurde verweigert. Bitte erlauben Sie den Zugriff.";
+            errorMessage = "Microphone access denied. Please allow microphone access.";
             break;
           case 'network':
-            errorMessage = "Netzwerkfehler. Überprüfen Sie Ihre Internetverbindung.";
+            errorMessage = "Network error. Please check your internet connection.";
             break;
           default:
-            errorMessage = `Spracherkennungsfehler: ${event.error}`;
+            errorMessage = `Speech recognition error: ${event.error}`;
         }
         
         toast({
-          title: "Aufnahmeproblem",
+          title: "Recording Issue",
           description: errorMessage,
           variant: event.error === 'no-speech' ? "default" : "destructive"
         });
@@ -143,8 +138,8 @@ export default function CatchStory() {
   const handleVoiceRecording = async () => {
     if (!isSupported) {
       toast({
-        title: "Nicht unterstützt",
-        description: "Spracherkennung wird in Ihrem Browser nicht unterstützt.",
+        title: "Not Supported",
+        description: "Speech recognition is not supported in your browser.",
         variant: "destructive"
       });
       return;
@@ -155,8 +150,8 @@ export default function CatchStory() {
       recognitionRef.current?.stop();
       setIsRecording(false);
       toast({
-        title: "Aufnahme gestoppt",
-        description: "Sprachaufnahme wurde beendet."
+        title: "Recording Stopped",
+        description: "Voice recording has been stopped."
       });
     } else {
       try {
@@ -186,14 +181,14 @@ export default function CatchStory() {
         console.log('Speech recognition start() called');
         
         toast({
-          title: "Aufnahme gestartet",
-          description: "Sprechen Sie deutlich und laut. Das System hört zu..."
+          title: "Recording Started",
+          description: "Speak clearly and loudly. The system is listening..."
         });
       } catch (error) {
         console.error('Microphone or speech recognition error:', error);
         toast({
-          title: "Fehler beim Starten",
-          description: "Mikrofonzugriff oder Spracherkennung fehlgeschlagen. Überprüfen Sie Ihre Browsereinstellungen.",
+          title: "Error Starting Recording",
+          description: "Microphone access or speech recognition failed. Please check your browser settings.",
           variant: "destructive"
         });
       }
@@ -275,7 +270,7 @@ export default function CatchStory() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
-                placeholder="Tippen Sie hier oder nutzen Sie die Sprachaufnahme..."
+                placeholder="Type here or use voice recording..."
                 value={storyPrompt}
                 onChange={(e) => setStoryPrompt(e.target.value)}
                 className="text-lg py-4 border-2 focus:border-primary/50 min-h-[120px] resize-none"
@@ -285,7 +280,7 @@ export default function CatchStory() {
               {isRecording && (
                 <div className="flex items-center justify-center gap-2 text-red-600 animate-pulse">
                   <div className="w-3 h-3 bg-red-600 rounded-full animate-ping"></div>
-                  <span className="text-sm font-medium">Aufnahme läuft... Sprechen Sie jetzt</span>
+                  <span className="text-sm font-medium">Recording... Speak now</span>
                 </div>
               )}
 
