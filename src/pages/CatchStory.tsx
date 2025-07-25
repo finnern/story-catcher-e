@@ -29,11 +29,18 @@ export default function CatchStory() {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         recognitionRef.current = new SpeechRecognition();
         
-        // Optimized settings for better recognition
+        // Enhanced settings for better speech detection
         recognitionRef.current.continuous = true; // Keep listening
         recognitionRef.current.interimResults = true;
         recognitionRef.current.lang = 'en-US'; // English language
-        recognitionRef.current.maxAlternatives = 3; // More alternatives
+        recognitionRef.current.maxAlternatives = 1; // Reduce for better performance
+        
+        // Key settings for better speech detection
+        if ('webkitSpeechRecognition' in window) {
+          recognitionRef.current.continuous = true;
+          recognitionRef.current.interimResults = true;
+          // Try to be more sensitive to speech
+        }
         
         console.log('Speech recognition initialized with lang:', recognitionRef.current.lang);
       } catch (error) {
@@ -170,16 +177,57 @@ export default function CatchStory() {
       try {
         console.log('Requesting microphone access...');
         
-        // Test microphone access with more specific constraints
+        // Test microphone access with enhanced settings
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
+            echoCancellation: false, // Disable to get raw audio
+            noiseSuppression: false, // Disable to avoid over-filtering
+            autoGainControl: true,   // Keep for volume adjustment
+            sampleRate: 16000,       // Standard rate for speech recognition
+            channelCount: 1          // Mono audio is sufficient
           }
         });
         
         console.log('Microphone access granted, audio tracks:', stream.getAudioTracks().length);
+        
+        // Test audio levels to ensure microphone is working
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        // Check for audio input for 2 seconds
+        let hasAudio = false;
+        const checkAudio = () => {
+          analyser.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+          console.log('Audio level:', average);
+          if (average > 10) { // Threshold for audio detection
+            hasAudio = true;
+            console.log('✓ Audio input detected - microphone is working!');
+          }
+        };
+        
+        // Check audio for 2 seconds
+        const interval = setInterval(checkAudio, 100);
+        setTimeout(() => {
+          clearInterval(interval);
+          audioContext.close();
+          
+          if (hasAudio) {
+            console.log('✓ Microphone test passed - starting speech recognition');
+          } else {
+            console.log('⚠ Low audio levels detected - speech recognition may not work well');
+            toast({
+              title: "Low Audio Detected",
+              description: "Please speak louder or check your microphone settings.",
+              variant: "default"
+            });
+          }
+        }, 2000);
         
         // Stop the test stream
         stream.getTracks().forEach(track => track.stop());
@@ -187,8 +235,6 @@ export default function CatchStory() {
         console.log('Starting speech recognition...');
         recognitionRef.current?.start();
         console.log('Speech recognition start() called successfully');
-        
-        // Don't show toast here, wait for onstart event
       } catch (error) {
         console.error('Microphone or speech recognition error:', error);
         toast({
